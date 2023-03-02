@@ -8,13 +8,7 @@ dotenv.config({ path: './config/config.env' });
 
 connectDatabase();
 
-const middleware = (req, res, next) => {
-  console.log('middleware');
-  req.requestMethod = req.method;
-  next();
-};
-
-app.use(middleware);
+app.use(express.json());
 
 const jobs = require('./routes/jobs.routes');
 
