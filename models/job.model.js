@@ -61,7 +61,7 @@ const jobSchema = new mongoose.Schema({
   },
   experience: {
     type: String,
-    required: true,
+    required: [true, 'Please enter experience required for this job'],
     enum: {
       values: ['No expirience', '0-1 years', '1-2 years', '2-3 years', '3-5 years', '5+ years'],
       message: 'Please select options for expirience',
