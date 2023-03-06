@@ -45,7 +45,7 @@ const jobSchema = new mongoose.Schema({
   },
   category: {
     type: [String],
-    required: true,
+    required: [true, 'Please enter category'],
     enum: {
       values: ['Front-end', 'Back-end', 'Full-stack', 'Devops', 'Mobile', 'Machine Learning', 'Data Science'],
       message: 'Please select options for categories',
@@ -53,7 +53,7 @@ const jobSchema = new mongoose.Schema({
   },
   jobType: {
     type: String,
-    required: true,
+    required: [true, 'Please enter job type'],
     enum: {
       values: ['Full-time', 'Partial', 'Freelance'],
       message: 'Please select options for job title',
