@@ -23,6 +23,22 @@ exports.newJob = async (req, res, next) => {
   });
 };
 
+exports.getJob = async (req, res, next) => {
+  const job = await Job.find({ $and: [{ _id: req.params.id }, { slug: req.params.slug }] });
+
+  if (!job || job.length === 0) {
+    return res.status(404).json({
+      success: false,
+      message: 'Job not found',
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: job,
+  });
+};
+
 exports.updateJob = async (req, res, next) => {
   let job = await Job.findById(req.params.id);
 
@@ -79,5 +95,43 @@ exports.getJobsInRadius = async (req, res, next) => {
     success: true,
     results: jobs.length,
     data: jobs,
+  });
+};
+
+exports.jobStats = async (req, res, next) => {
+  const status = await Job.aggregate([
+    {
+      $match: { $text: { $search: '"' + req.params.topic + '"' } },
+    },
+    {
+      $group: {
+        _id: { $toUpper: '$experience' },
+        totalJobs: { $sum: 1 },
+        avgSalary: {
+          $avg: '$positions',
+        },
+        avgSalary: {
+          $avg: '$salary',
+        },
+        minSalary: {
+          $min: '$salary',
+        },
+        maxSalary: {
+          $max: '$salary',
+        },
+      },
+    },
+  ]);
+
+  if (status.length === 0) {
+    return res.status(200).json({
+      success: false,
+      message: `No stats found ${req.params.stass}`,
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: status,
   });
 };
