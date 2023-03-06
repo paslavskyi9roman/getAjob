@@ -3,6 +3,7 @@ const app = express();
 
 const dotenv = require('dotenv');
 const connectDatabase = require('./config/database');
+const errorMiddleware = require('./middleware/error');
 
 dotenv.config({ path: './config/config.env' });
 
@@ -13,6 +14,8 @@ app.use(express.json());
 const jobs = require('./routes/jobs.routes');
 
 app.use('/api/v1', jobs);
+
+app.use(errorMiddleware);
 
 const PORT = process.env.PORT;
 
