@@ -24,7 +24,7 @@ exports.newJob = async (req, res, next) => {
 };
 
 exports.updateJob = async (req, res, next) => {
-  let job = Job.findById(req.params.id);
+  let job = await Job.findById(req.params.id);
 
   if (!job) {
     res.status(404).json({
@@ -42,6 +42,24 @@ exports.updateJob = async (req, res, next) => {
     success: true,
     message: 'Job updated successfully',
     data: job,
+  });
+};
+
+exports.deleteJob = async (req, res, next) => {
+  let job = await Job.findById(req.params.id);
+
+  if (!job) {
+    return res.status(404).json({
+      success: false,
+      message: 'Job not found',
+    });
+  }
+
+  job = await Job.findByIdAndDelete(req.params.id);
+
+  res.status(200).json({
+    success: true,
+    message: 'Job deleted successfully',
   });
 };
 
