@@ -1,7 +1,7 @@
 {
   "name": "getajob",
   "version": "1.0.0",
-  "description": "api for job serach",
+  "description": "api for job search",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -11,6 +11,7 @@
   "author": "Roman Paslavskyi",
   "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "mongoose": "^7.0.0",
