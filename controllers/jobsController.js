@@ -1,8 +1,10 @@
 const Job = require('../models/job.model');
 
 const geoCoder = require('../utils/geocoder');
+const ErrorHandler = require('../utils/errorHandler');
+const catchAsyncErrors = require('../middleware/catchAsyncErrors');
 
-exports.getJobs = async (req, res, next) => {
+exports.getJobs = catchAsyncErrors(async (req, res, next) => {
   const jobs = await Job.find();
 
   res.status(200).json({
@@ -11,42 +13,36 @@ exports.getJobs = async (req, res, next) => {
     results: jobs.length,
     data: jobs,
   });
-};
+});
 
-exports.newJob = async (req, res, next) => {
+exports.newJob = catchAsyncErrors(async (req, res, next) => {
   const job = await Job.create(req.body);
 
   res.status(200).json({
     success: true,
-    message: 'Job has been created successfully',
+    message: 'Job Created.',
     data: job,
   });
-};
+});
 
-exports.getJob = async (req, res, next) => {
+exports.getJob = catchAsyncErrors(async (req, res, next) => {
   const job = await Job.find({ $and: [{ _id: req.params.id }, { slug: req.params.slug }] });
 
   if (!job || job.length === 0) {
-    return res.status(404).json({
-      success: false,
-      message: 'Job not found',
-    });
+    return next(new ErrorHandler('Job not found', 404));
   }
 
   res.status(200).json({
     success: true,
     data: job,
   });
-};
+});
 
-exports.updateJob = async (req, res, next) => {
+exports.updateJob = catchAsyncErrors(async (req, res, next) => {
   let job = await Job.findById(req.params.id);
 
   if (!job) {
-    res.status(404).json({
-      success: false,
-      message: 'Job not found',
-    });
+    return next(new ErrorHandler('Job not Found', 404));
   }
 
   job = await Job.findByIdAndUpdate(req.params.id, req.body, {
@@ -59,16 +55,13 @@ exports.updateJob = async (req, res, next) => {
     message: 'Job updated successfully',
     data: job,
   });
-};
+});
 
-exports.deleteJob = async (req, res, next) => {
+exports.deleteJob = catchAsyncErrors(async (req, res, next) => {
   let job = await Job.findById(req.params.id);
 
   if (!job) {
-    return res.status(404).json({
-      success: false,
-      message: 'Job not found',
-    });
+    return next(new ErrorHandler('Job not found', 404));
   }
 
   job = await Job.findByIdAndDelete(req.params.id);
@@ -77,9 +70,9 @@ exports.deleteJob = async (req, res, next) => {
     success: true,
     message: 'Job deleted successfully',
   });
-};
+});
 
-exports.getJobsInRadius = async (req, res, next) => {
+exports.getJobsInRadius = catchAsyncErrors(async (req, res, next) => {
   const { zipcode, distance } = req.params;
 
   const loc = await geoCoder.geocode(zipcode);
@@ -96,9 +89,9 @@ exports.getJobsInRadius = async (req, res, next) => {
     results: jobs.length,
     data: jobs,
   });
-};
+});
 
-exports.jobStats = async (req, res, next) => {
+exports.jobStats = catchAsyncErrors(async (req, res, next) => {
   const status = await Job.aggregate([
     {
       $match: { $text: { $search: '"' + req.params.topic + '"' } },
@@ -124,14 +117,11 @@ exports.jobStats = async (req, res, next) => {
   ]);
 
   if (status.length === 0) {
-    return res.status(200).json({
-      success: false,
-      message: `No stats found ${req.params.stass}`,
-    });
+    return next(new ErrorHandler(`No stats found ${req.params.stass}`, 200));
   }
 
   res.status(200).json({
     success: true,
-    data: status,
+    data: stats,
   });
-};
+});
