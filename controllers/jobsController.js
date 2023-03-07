@@ -3,8 +3,11 @@ const Job = require('../models/job.model');
 const geoCoder = require('../utils/geocoder');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middleware/catchAsyncErrors');
+// const APIFilters = require('../middleware/apiFilters');
 
 exports.getJobs = catchAsyncErrors(async (req, res, next) => {
+  // const apiFilters = new APIFilters(Job.find(), req.query).filter();
+  // const jobs = await apiFilters.query;
   const jobs = await Job.find();
 
   res.status(200).json({
@@ -73,9 +76,9 @@ exports.deleteJob = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getJobsInRadius = catchAsyncErrors(async (req, res, next) => {
-  const { zipcode, distance } = req.params;
+  const { zipCode, distance } = req.params;
 
-  const loc = await geoCoder.geocode(zipcode);
+  const loc = await geoCoder.geocode(zipCode);
   const latitude = loc[0].latitude;
   const longitude = loc[0].longitude;
   const radius = distance / 3963;
@@ -117,7 +120,7 @@ exports.jobStats = catchAsyncErrors(async (req, res, next) => {
   ]);
 
   if (status.length === 0) {
-    return next(new ErrorHandler(`No stats found ${req.params.stass}`, 200));
+    return next(new ErrorHandler(`No stats found ${req.params.stats}`, 200));
   }
 
   res.status(200).json({
