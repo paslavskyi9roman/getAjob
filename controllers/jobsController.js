@@ -6,7 +6,7 @@ const catchAsyncErrors = require('../middleware/catchAsyncErrors');
 const APIFilters = require('../utils/apiFilters');
 
 exports.getJobs = catchAsyncErrors(async (req, res, next) => {
-  const apiFilters = new APIFilters(Job.find(), req.query).filter();
+  const apiFilters = new APIFilters(Job.find(), req.query).filter().sort();
 
   const jobs = await apiFilters.query;
 
