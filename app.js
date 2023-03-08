@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 const connectDatabase = require('./config/database');
 const errorMiddleware = require('./middleware/error');
 const ErrorHandler = require('./middleware/error');
@@ -17,9 +18,13 @@ connectDatabase();
 
 app.use(express.json());
 
+app.use(cookieParser());
+
 const jobs = require('./routes/jobs.routes');
+const auth = require('./routes/auth.routes');
 
 app.use('/api/v1', jobs);
+app.use('/api/v1', auth);
 
 app.all('*', (req, res, next) => {
   next(new ErrorHandler(`${req.originalUrl} route not found, 404`));

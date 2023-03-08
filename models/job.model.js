@@ -36,7 +36,7 @@ const jobSchema = new mongoose.Schema({
     formattedAddress: String,
     city: String,
     state: String,
-    zipcode: String,
+    zipCode: String,
     country: String,
   },
   company: {
@@ -63,8 +63,8 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please enter experience required for this job'],
     enum: {
-      values: ['No expirience', '0-1 years', '1-2 years', '2-3 years', '3-5 years', '5+ years'],
-      message: 'Please select options for expirience',
+      values: ['No experience', '0-1 years', '1-2 years', '2-3 years', '3-5 years', '5+ years'],
+      message: 'Please select options for experience',
     },
   },
   salary: {
@@ -78,6 +78,11 @@ const jobSchema = new mongoose.Schema({
   applicantsApplied: {
     type: [Object],
     select: false,
+  },
+  user: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required: true,
   },
 });
 
@@ -96,7 +101,7 @@ jobSchema.pre('save', async function (next) {
     formattedAddress: loc[0].formattedAddress,
     city: loc[0].city,
     state: loc[0].stateCode,
-    zipcode: loc[0].zipCode,
+    zipCode: loc[0].zipCode,
     country: loc[0].countryCode,
   };
 });
