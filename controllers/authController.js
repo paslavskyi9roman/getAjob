@@ -84,7 +84,7 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
   });
 
   if (!user) {
-    return next(new ErrorHandler('Password Reset token is invalid or has been expired.'), 400);
+    return next(new ErrorHandler('Password Reset token is invalid or has been expired.', 400));
   }
 
   user.password = req.body.password;
@@ -95,4 +95,16 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
   await user.save();
 
   sendToken(user, 200, res);
+});
+
+exports.logout = catchAsyncErrors(async (req, res, next) => {
+  res.cookie('token', 'none', {
+    expires: new Date(Date.now()),
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: 'Logged out successfully.',
+  });
 });
