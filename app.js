@@ -22,9 +22,11 @@ app.use(cookieParser());
 
 const jobs = require('./routes/jobs.routes');
 const auth = require('./routes/auth.routes');
+const user = require('./routes/user.routes');
 
 app.use('/api/v1', jobs);
 app.use('/api/v1', auth);
+app.use('/api/v1', user);
 
 app.all('*', (req, res, next) => {
   next(new ErrorHandler(`${req.originalUrl} route not found, 404`));
