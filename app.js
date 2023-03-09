@@ -7,7 +7,7 @@ const fileUpload = require('express-fileupload');
 
 const connectDatabase = require('./config/database');
 const errorMiddleware = require('./middleware/error');
-const ErrorHandler = require('./middleware/error');
+const ErrorHandler = require('./utils/errorHandler');
 
 dotenv.config({ path: './config/config.env' });
 
