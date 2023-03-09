@@ -3,6 +3,8 @@ const app = express();
 
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
+
 const connectDatabase = require('./config/database');
 const errorMiddleware = require('./middleware/error');
 const ErrorHandler = require('./middleware/error');
@@ -19,6 +21,8 @@ connectDatabase();
 app.use(express.json());
 
 app.use(cookieParser());
+
+app.use(fileUpload());
 
 const jobs = require('./routes/jobs.routes');
 const auth = require('./routes/auth.routes');
