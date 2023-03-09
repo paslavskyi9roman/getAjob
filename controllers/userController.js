@@ -1,8 +1,10 @@
 const User = require('../models/user.model');
+const Job = require('../models/job.model');
 const catchAsyncErrors = require('../middleware/catchAsyncErrors');
 const ErrorHandler = require('../utils/errorHandler');
 const sendToken = require('../utils/jwtToken');
 const fs = require('fs');
+const APIFilters = require('../utils/apiFilters');
 
 exports.getUserProfile = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user.id).populate({
@@ -47,6 +49,16 @@ exports.updateUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+exports.getAppliedJobs = catchAsyncErrors(async (req, res, next) => {
+  const jobs = await Job.find({ 'applicantsApplied.id': req.user.id }).select('+applicantsApplied');
+
+  res.status(200).json({
+    success: true,
+    results: jobs.length,
+    data: jobs,
+  });
+});
+
 exports.getPublishedJobs = catchAsyncErrors(async (req, res, next) => {
   const jobs = await Job.find({ user: req.user.id });
 
@@ -70,6 +82,34 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: 'Your account has been deleted.',
+  });
+});
+
+exports.getUsers = catchAsyncErrors(async (req, res, next) => {
+  const apiFilters = new APIFilters(User.find(), req.query).filter().sort().limitFields().pagination();
+
+  const users = await apiFilters.query;
+
+  res.status(200).json({
+    success: true,
+    results: users.length,
+    data: users,
+  });
+});
+
+exports.deleteUserAdmin = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(new ErrorHandler(`User not found with id: ${req.params.id}`, 404));
+  }
+
+  deleteUserData(user.id, user.role);
+  await user.remove();
+
+  res.status(200).json({
+    success: true,
+    message: 'User is deleted by Admin.',
   });
 });
 

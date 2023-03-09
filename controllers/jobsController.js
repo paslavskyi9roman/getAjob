@@ -5,6 +5,7 @@ const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middleware/catchAsyncErrors');
 const APIFilters = require('../utils/apiFilters');
 const path = require('path');
+const fs = require('fs');
 
 exports.getJobs = catchAsyncErrors(async (req, res, next) => {
   const apiFilters = new APIFilters(Job.find(), req.query).filter().sort().limitFields().searchByQuery().pagination();
@@ -50,6 +51,10 @@ exports.updateJob = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler('Job not Found', 404));
   }
 
+  if (job.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorHandler(`User(${req.user.id}) is not allowed to update this job.`));
+  }
+
   job = await Job.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
@@ -67,6 +72,18 @@ exports.deleteJob = catchAsyncErrors(async (req, res, next) => {
 
   if (!job) {
     return next(new ErrorHandler('Job not found', 404));
+  }
+
+  if (job.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorHandler(`User(${req.user.id}) is not allowed to delete this job.`));
+  }
+
+  for (let i = 0; i < job.applicantsApplied.length; i++) {
+    let filepath = `${__dirname}/public/uploads/${job.applicantsApplied[i].resume}`.replace('\\controllers', '');
+
+    fs.unlink(filepath, (err) => {
+      if (err) return console.log(err);
+    });
   }
 
   job = await Job.findByIdAndDelete(req.params.id);
