@@ -47,6 +47,16 @@ exports.updateUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+exports.getPublishedJobs = catchAsyncErrors(async (req, res, next) => {
+  const jobs = await Job.find({ user: req.user.id });
+
+  res.status(200).json({
+    success: true,
+    results: jobs.length,
+    data: jobs,
+  });
+});
+
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   deleteUserData(req.user.id, req.user.role);
 
