@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const sanitizer = require('express-mongo-sanitize');
+const xssClean = require('xss-clean');
 
 const connectDatabase = require('./config/database');
 const errorMiddleware = require('./middleware/error');
@@ -20,13 +22,17 @@ process.on('uncaughtException', (err) => {
 
 connectDatabase();
 
+app.use(helmet());
+
 app.use(express.json());
 
 app.use(cookieParser());
 
 app.use(fileUpload());
 
-app.use(helmet());
+app.use(sanitizer());
+
+app.use(xssClean());
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, //10 Mints
