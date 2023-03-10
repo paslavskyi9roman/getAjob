@@ -4,6 +4,8 @@ const app = express();
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const connectDatabase = require('./config/database');
 const errorMiddleware = require('./middleware/error');
@@ -23,6 +25,15 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(fileUpload());
+
+app.use(helmet());
+
+const limiter = rateLimit({
+  windowMs: 10 * 60 * 1000, //10 Mints
+  max: 100,
+});
+
+app.use(limiter);
 
 const jobs = require('./routes/jobs.routes');
 const auth = require('./routes/auth.routes');
